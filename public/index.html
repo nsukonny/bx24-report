@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bitrix24 app tutorial</title>
+    <script src="https://api.bitrix24.com/api/v1/"></script>
+    <style>table {
+        border: 3px solid #000000;
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+    }
+
+    table td, table th {
+        border: 1px solid #000000;
+        padding: 5px 4px;
+    }
+
+    table tbody td {
+        font-size: 13px;
+    }
+
+    table thead {
+        background: #CFCFCF;
+        background: -moz-linear-gradient(top, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+        background: -webkit-linear-gradient(top, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+        background: linear-gradient(to bottom, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+        border-bottom: 3px solid #000000;
+    }
+
+    table thead th {
+        font-size: 15px;
+        font-weight: bold;
+        color: #000000;
+        text-align: left;
+    }
+
+    table tfoot {
+        font-size: 14px;
+        font-weight: bold;
+        color: #000000;
+        border-top: 3px solid #000000;
+    }
+
+    table tfoot td {
+        font-size: 14px;
+    }
+
+    table .line_hided {
+        display: none;
+    }
+    </style>
+</head>
+<body>
+
+<h3>Завершенные задачи</h3>
+<table id="completed">
+
+    <?/*Начало фиьтра- календаря*/?>
+
+
+    <div class="sidebar-block-inner">
+        <div class="filter-block-title report-filter-block-title">Фильтр
+            <!--<a class="filter-settings" href=""></a>--></div>
+        <div class="filter-block filter-field-date-combobox filter-field-date-combobox-interval">
+
+            <form id="report-rewrite-filter" action="#" onsubmit="apply_filter(); return false;" method="GET">
+
+                <input type="hidden" name="set_filter" value="Y">
+                <input type="hidden" name="sort_id" value="0">
+                <input type="hidden" name="sort_type" value="ASC">
+
+
+                <div class="filter-field">
+                    <div class="tasks-report-filter-range">
+                        <input type="checkbox" name="select_my_tasks" id="select_my_tasks" checked=""
+                               title="Выводятся все задачи, где Вы являетесь исполнителем или соисполнителем"><label
+                            title="Выводятся все задачи, где Вы являетесь исполнителем или соисполнителем"
+                            for="select_my_tasks" class="filter-field-title">Завершенные задачи</label>
+                    </div>
+                    <div class="tasks-report-filter-range">
+                        <input type="checkbox" name="select_depts_tasks" id="select_depts_tasks"
+                               title="Выводятся задачи Ваших подчиненных и задачи, где Вы являетесь постановщиком"><label
+                            title="Выводятся задачи Ваших подчиненных и задачи, где Вы являетесь постановщиком"
+                            for="select_depts_tasks" class="filter-field-title">Текущие задачи</label>
+                    </div>
+                    <!--
+                    <div class="tasks-report-filter-range tasks-report-filter-range-last">
+                        <input type="checkbox" name="select_group_tasks" id="select_group_tasks"
+                               title="Выводятся все задачи из групп, в которых Вы состоите"><label
+                            title="Выводятся все задачи из групп, в которых Вы состоите" for="select_group_tasks"
+                            class="filter-field-title">Встречи</label>
+                    </div> -->
+                </div>
+
+                <!-- period -->
+                <div class="filter-field filter-field-date-combobox filter-field-date-combobox-month">
+                    <label for="task-interval-filter" class="filter-field-title">Отчет за период</label>
+                    <select class="filter-dropdown" style="margin-bottom: 0;"
+                            id="task-interval-filter" name="F_DATE_TYPE">
+                        <option value="month">этот месяц</option>
+                        <option value="month_ago">прошл. месяц</option>
+                        <option value="week" selected="">эта неделя</option>
+                        <option value="week_ago">прошл. неделя</option>
+                    </select>
+                    <span class="filter-date-interval">
+                        <span class="filter-date-interval-from">
+                        <input type="date" class="filter-date-interval-from" name="F_DATE_FROM"
+                               id="REPORT_INTERVAL_F_DATE_FROM" value="">
+                            <a
+                                    class="filter-date-interval-calendar" href="" title="Выбрать дату в календаре"
+                                    id="filter-date-interval-calendar-from">
+                                <img
+                                        src="https://eva.bitrix24.ru/bitrix/js/main/core/images/calendar-icon.gif"
+                                        alt="Выбрать дату в календаре"
+                                        border="0"></a>
+                        </span>
+
+                        <span class="filter-date-interval-hellip">…</span>
+                        <span class="filter-date-interval-to">
+                            <input type="date" class="filter-date-interval-to" name="F_DATE_TO"
+                                   id="REPORT_INTERVAL_F_DATE_TO" value="">
+                            <a href="" class="filter-date-interval-calendar" title="Выбрать дату в календаре"
+                               id="filter-date-interval-calendar-to">
+                                <img src="https://eva.bitrix24.ru/bitrix/js/main/core/images/calendar-icon.gif"
+                                     alt="Выбрать дату в календаре" border="0"></a></span>
+				</span>
+                    <span class="filter-day-interval"><input type="text" size="5" class="filter-date-days" value=""
+                                                             name="F_DATE_DAYS"> дн.</span>
+
+                </div>
+
+                <div id="report-filter-chfilter">
+
+
+                </div>
+
+
+                <div class="filter-field-buttons">
+                    <input id="report-rewrite-filter-button" type="submit" value="Применить" class="filter-submit">&nbsp;&nbsp;<input
+                        id="report-reset-filter-button" type="submit" name="del_filter_company_search" value="Отмена"
+                        class="filter-submit">
+                </div>
+
+            </form>
+
+
+        </div>
+    </div>
+    <?/*Конец фиьтра*/?>
+
+    <thead class="main-grid-header">
+    <tr class="main-grid-row main-grid-row-body">
+        <td class="main-grid-cell main-grid-cell-left"></td>
+        <td class="main-grid-cell main-grid-cell-left">ФИО</td>
+        <td class="main-grid-cell main-grid-cell-left">Количество задач</td>
+        <td class="main-grid-cell main-grid-cell-left">Задача</td>
+        <td class="main-grid-cell main-grid-cell-left">Дата постановки</td>
+        <td class="main-grid-cell main-grid-cell-left">Дата завершения</td>
+        <td class="main-grid-cell main-grid-cell-left">Дата фактич. завершения</td>
+        <td class="main-grid-cell main-grid-cell-left">Ответственный</td>
+        <td class="main-grid-cell main-grid-cell-left">Постановщик</td>
+        <td class="main-grid-cell main-grid-cell-left">Наблюдатель</td>
+        <td class="main-grid-cell main-grid-cell-left">Оценка</td>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<h3>Текущие задачи</h3>
+<table id="in-progress">
+    <thead class="main-grid-header">
+    <tr class="main-grid-row main-grid-row-body">
+        <td class="main-grid-cell main-grid-cell-left"></td>
+        <td class="main-grid-cell main-grid-cell-left">ФИО</td>
+        <td class="main-grid-cell main-grid-cell-left">Количество задач</td>
+        <td class="main-grid-cell main-grid-cell-left">Задача</td>
+        <td class="main-grid-cell main-grid-cell-left">Дата постановки</td>
+        <td class="main-grid-cell main-grid-cell-left">Дата завершения</td>
+        <td class="main-grid-cell main-grid-cell-left">Дата фактич. завершения</td>
+        <td class="main-grid-cell main-grid-cell-left">Ответственный</td>
+        <td class="main-grid-cell main-grid-cell-left">Постановщик</td>
+        <td class="main-grid-cell main-grid-cell-left">Наблюдатель</td>
+        <td class="main-grid-cell main-grid-cell-left">Оценка</td>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<script>
+    BX24.init(app);
+
+    let currentUser = null,
+        departments = [],
+        users = [],
+        allActiveUsers = [],
+        dateFrom = null,
+        dateTo = null,
+        showCompleted = false,
+        showInProgress = false;
+
+    function apply_filter() {
+
+        currentUser = null;
+        departments = [];
+        users = [];
+        dateFrom = dateToISO(document.getElementsByName("F_DATE_FROM")[0].value);
+        dateTo = dateToISO(document.getElementsByName("F_DATE_TO")[0].value);
+        showCompleted = document.getElementsByName("select_my_tasks")[0].checked;
+        showInProgress = document.getElementsByName("select_depts_tasks")[0].checked;
+
+        if (showCompleted) {
+            document.getElementById('completed').hidden = false;
+        } else {
+            document.getElementById('completed').hidden = true;
+        }
+
+        if (showInProgress) {
+            document.getElementById('in-progress').hidden = false;
+        } else {
+            document.getElementById('in-progress').hidden = true;
+        }
+
+        let completedTBody = document.getElementById('completed').getElementsByTagName('tbody')[0];
+        completedTBody.innerHTML = '';
+        let inprogressTBody = document.getElementById('in-progress').getElementsByTagName('tbody')[0];
+        inprogressTBody.innerHTML = '';
+
+        getAllUsersPromise()
+            .then(function (users) {
+                allActiveUsers = users;
+
+                return getCurrentUserPromise();
+            })
+            .then(function (curUser) {
+                currentUser = curUser;
+
+                return getDepartmentsPromise();
+            })
+            .then(function (allDepartments) {
+
+                if (0 < currentUser.UF_DEPARTMENT.length) {
+                    for (let depKey = 0; depKey < currentUser.UF_DEPARTMENT.length; depKey++) {
+                        departments.push(parseInt(currentUser.UF_DEPARTMENT[depKey]));
+                    }
+                }
+
+                addDepartmentChildren(allDepartments);
+
+                return getUsersPromise();
+            })
+            .then(function (usersFromDepartments) {
+                users = usersFromDepartments;
+
+                for (let userKey = 0; userKey < usersFromDepartments.length; userKey++) {
+                    getTasksListPromise(usersFromDepartments[userKey].ID)
+                        .then(function (userTasks) {
+                            let user = usersFromDepartments[userKey];
+
+                            user.completed = [];
+                            user.inProgress = [];
+
+                            for (let taskKey = 0; taskKey < userTasks.length; taskKey++) {
+
+                                if ('5' === userTasks[taskKey].status) {
+                                    user.completed.push(userTasks[taskKey]);
+                                } else if ('2' === userTasks[taskKey].status) {
+                                    user.inProgress.push(userTasks[taskKey]);
+                                }
+                            }
+
+                            addUserToTable('completed', user);
+                            addUserToTable('in-progress', user);
+
+                            return true;
+                        })
+                        .catch(console.error);
+                }
+
+                return true;
+            })
+            .catch(console.error);
+    }
+
+    apply_filter();
+
+    /**
+     * Display date in readable format
+     *
+     * @param dateObject
+     */
+    function prettyDate(date) {
+
+        if (null == date || 1 >= date.length) {
+            return '';
+        }
+
+        let dateString = '',
+            dateObject = new Date(date),
+            month = 0;
+
+        month = dateObject.getMonth();
+        month++;
+
+        if (12 < month) {
+            month = 1;
+        }
+
+        dateString += ('0' + dateObject.getDate()).slice(-2) + '.';
+        dateString += ('0' + month).slice(-2) + '.';
+        dateString += dateObject.getFullYear() + ' ';
+        dateString += ('0' + dateObject.getHours()).slice(-2) + ':';
+        dateString += ('0' + dateObject.getMinutes()).slice(-2);
+
+        return dateString;
+    }
+
+    /**
+     *  Get username from array of users
+     *
+     * @param userId
+     */
+    function getUserById(userId) {
+
+        for (let userKey = 0; userKey < allActiveUsers.length; userKey++) {
+            if (userId == allActiveUsers[userKey].ID) {
+                return allActiveUsers[userKey].NAME + ' ' + allActiveUsers[userKey].LAST_NAME;
+            }
+        }
+
+        return '';
+    }
+
+    function app() {
+        const initDate = BX24.getAuth();
+    }
+
+    function getCurrentUserPromise() {
+
+        return new Promise((resolve, reject) => {
+            //BX24.callMethod('user.get', {ID: 28}, function (res) {
+            BX24.callMethod("user.current", {}, function (res) {
+                resolve(res.data());
+            });
+        });
+
+    }
+
+    function getDepartmentsPromise() {
+
+        return new Promise((resolve, reject) => {
+            BX24.callMethod('department.get', {}, function (res) {
+                resolve(res.data());
+            });
+        });
+
+    }
+
+    function getUsersPromise() {
+
+        return new Promise((resolve, reject) => {
+            BX24.callMethod('user.get',
+                {
+                    sort: 'ID',
+                    order: 'ASC',
+                    FILTER: {
+                        USER_TYPE: 'employee',
+                        UF_DEPARTMENT: departments
+                    }
+                },
+                function (res) {
+                    resolve(res.data());
+                });
+        });
+    }
+
+    function getAllUsersPromise() {
+
+        return new Promise((resolve, reject) => {
+            let allUsers = [];
+
+            BX24.callMethod('user.get',
+                {
+                    sort: 'ID',
+                    order: 'ASC',
+                    FILTER: {
+                        ACTIVE: true,
+                        USER_TYPE: 'employee',
+                    }
+                },
+                function (res) {
+                    const users = (res.data() && Array.isArray(res.data())) ? res.data() : [];
+                    allUsers = allUsers.concat(users);
+
+                    if (res.more()) {
+                        res.next();
+                    } else {
+                        return resolve(allUsers);
+                    }
+                });
+        });
+    }
+
+    function getTasksListPromise(userId) {
+
+        let filter = {
+            RESPONSIBLE_ID: userId
+        };
+
+        if (null !== dateFrom) {
+            filter['>=CREATED_DATE'] = dateFrom;
+        }
+
+        if (null !== dateTo) {
+            filter['<CREATED_DATE'] = dateTo;
+        }
+
+        return new Promise((resolve, reject) => {
+            let listTasks = [];
+            BX24.callMethod('tasks.task.list',
+                {
+                    limit: 200,
+                    filter: filter,
+                    select: [
+                        'ID',
+                        'TITLE',
+                        'STATUS',
+                        'CREATED_DATE',
+                        'END_DATE_PLAN',
+                        'CLOSED_DATE',
+                        'RESPONSIBLE_ID',
+                        'COMMENTS_COUNT',
+                        'CREATED_BY',
+                        'AUDITORS',
+                        'MARK',
+                    ],
+                },
+                function (res) {
+
+                    const tasks = (res.data() && res.data().tasks && Array.isArray(res.data().tasks)) ? res.data().tasks : [];
+                    listTasks = listTasks.concat(tasks);
+
+                    if (res.more()) {
+                        res.next();
+                    } else {
+                        return resolve(listTasks);
+                    }
+                });
+        });
+    }
+
+    function getCommentsListPromise(taskId) {
+
+        return new Promise((resolve, reject) => {
+            let commentsList = [];
+
+            BX24.callMethod('task.commentitem.getlist',
+                {
+                    TASKID: taskId,
+                },
+                function (res) {
+                    const comments = (res.data() && Array.isArray(res.data())) ? res.data() : [];
+                    commentsList = commentsList.concat(comments);
+
+                    if (res.more()) {
+                        res.next();
+                    } else {
+                        return resolve(commentsList);
+                    }
+                });
+        });
+    }
+
+    /**
+     * Get from departments all children and add it to array
+     */
+    function addDepartmentChildren(allDepartments) {
+
+        for (let depKey = 0; depKey < allDepartments.length; depKey++) {
+            if ('PARENT' in allDepartments[depKey]
+                && departments.includes(parseInt(allDepartments[depKey].PARENT))
+                && !departments.includes(parseInt(allDepartments[depKey].ID))) {
+                departments.push(parseInt(allDepartments[depKey].ID));
+
+                return addDepartmentChildren(allDepartments);
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * Add current user to table
+     */
+    function addUserToTable(tableType, user) {
+
+        if (null == user.NAME && null == user.LAST_NAME) {
+            return;
+        }
+
+        let completedTBody = document.getElementById(tableType).getElementsByTagName('tbody')[0];
+
+        let rowUser = completedTBody.insertRow(),
+            cellUserShow = rowUser.insertCell(),
+            cellUserName = rowUser.insertCell(),
+            cellCount = rowUser.insertCell(),
+            cellLong = rowUser.insertCell(),
+            tasks = [];
+
+        if ('completed' == tableType) {
+            tasks = user.completed;
+        } else if ('in-progress' == tableType) {
+            tasks = user.inProgress;
+        }
+
+        if (0 < tasks.length) {
+            let userShow = document.createElement("a");
+            userShow.setAttribute('href', '#');
+            userShow.setAttribute('class', 'show-tasks');
+            userShow.setAttribute('data-user-id', user.ID);
+            userShow.appendChild(document.createTextNode('+'));
+            cellUserShow.appendChild(userShow);
+        }
+
+        let userName = document.createTextNode(user.NAME + ' ' + user.LAST_NAME);
+        cellUserName.appendChild(userName);
+
+        let count = document.createTextNode('' + tasks.length);
+        cellCount.appendChild(count);
+
+        cellLong.colSpan = 8;
+
+        if (0 < tasks.length) {
+            for (let taskKey = 0; taskKey < tasks.length; taskKey++) {
+                let task = tasks[taskKey],
+                    rowTask = completedTBody.insertRow(),
+                    cellUserShow = rowTask.insertCell(),
+                    cellUserName = rowTask.insertCell(),
+                    cellTaskShow = rowTask.insertCell(),
+                    cellTaskTitle = rowTask.insertCell(),
+                    cellTaskCreated = rowTask.insertCell(),
+                    cellTaskEndDatePlan = rowTask.insertCell(),
+                    cellTaskClosedDate = rowTask.insertCell(),
+                    cellTaskResponsible = rowTask.insertCell(),
+                    cellTaskCreator = rowTask.insertCell(),
+                    cellTaskAuditor = rowTask.insertCell(),
+                    cellTaskMark = rowTask.insertCell();
+
+                rowTask.setAttribute('data-task-user', user.ID);
+                rowTask.setAttribute('class', 'line_hided');
+
+                if (0 < task.commentsCount) {
+                    let taskShow = document.createElement("a");
+                    taskShow.setAttribute('href', '#');
+                    taskShow.setAttribute('class', 'show-comments');
+                    taskShow.setAttribute('data-task-id', task.id);
+                    taskShow.appendChild(document.createTextNode('+'));
+                    cellTaskShow.appendChild(taskShow);
+                }
+
+                let taskTitle = document.createTextNode(task.title);
+                cellTaskTitle.appendChild(taskTitle);
+
+                let taskCreated = document.createTextNode(prettyDate(task.createdDate));
+                cellTaskCreated.appendChild(taskCreated);
+
+                let taskEndDatePlan = document.createTextNode(prettyDate(task.endDatePlan));
+                cellTaskEndDatePlan.appendChild(taskEndDatePlan);
+
+                let taskClosedDate = document.createTextNode(prettyDate(task.closedDate));
+                cellTaskClosedDate.appendChild(taskClosedDate);
+
+                if (task.responsible) {
+                    let taskResponsible = document.createTextNode(task.responsible.name);
+                    cellTaskResponsible.appendChild(taskResponsible);
+                }
+
+                if (task.creator) {
+                    let taskCreator = document.createTextNode(task.creator.name);
+                    cellTaskCreator.appendChild(taskCreator);
+                }
+
+                if (task.auditors && 0 < task.auditors.length) {
+                    let auditors = getAuditorsList(task.auditors),
+                        taskAuditors = document.createTextNode(auditors);
+                    cellTaskAuditor.appendChild(taskAuditors);
+                }
+
+                let taskMark = document.createTextNode(' ');
+                if (task.mark && 0 < task.mark.length) {
+                    if ('P' == task.mark.trim()) {
+                        taskMark = document.createTextNode('Положительная');
+                    } else if ('N' == task.mark.trim()) {
+                        taskMark = document.createTextNode('Отрицательная');
+                    }
+                }
+                cellTaskMark.appendChild(taskMark);
+
+            }
+        }
+
+    }
+
+    /**
+     * Add comment lines for task by request
+     **/
+    function addTaskCommentsToTable(comments, taskRowElement, taskId) {
+
+        let tBody = taskRowElement.closest('tbody');
+
+        for (let commentKey = 0; commentKey <= comments.length; commentKey++) {
+            if (undefined === comments[commentKey]) {
+                continue;
+            }
+
+            let rowComment = tBody.insertRow(taskRowElement.rowIndex),
+                cellUserShow = rowComment.insertCell(),
+                cellUserName = rowComment.insertCell(),
+                cellCount = rowComment.insertCell(),
+                cellComment = rowComment.insertCell(),
+                commentText = '';
+
+            rowComment.setAttribute('data-comment-task-id', taskId);
+            rowComment.setAttribute('class', 'box-order-comment-line');
+
+            commentText += '<b>' + comments[commentKey].AUTHOR_NAME + '</b>  ' + dateToReadable(comments[commentKey].POST_DATE) + '<br>';
+            if (null !== comments[commentKey].POST_MESSAGE) {
+                commentText += comments[commentKey].POST_MESSAGE;
+            } else if (null !== comments[commentKey].POST_MESSAGE_HTML) {
+                commentText += comments[commentKey].POST_MESSAGE_HTML;
+            }
+
+            cellComment.colSpan = 8;
+            cellComment.innerHTML = removeTags(commentText);
+        }
+
+    }
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target && 'show-tasks' === e.target.className) {
+            e.preventDefault();
+
+            let tasks = e.target.closest('table').querySelectorAll('[data-task-user="' + e.target.dataset.userId + '"]'),
+                text = e.target.textContent;
+
+            if (text == '+') {
+                e.target.textContent = '-';
+            } else {
+                e.target.textContent = '+';
+            }
+
+            tasks.forEach((element) => {
+                let oldComments = document.getElementsByClassName('box-order-comment-line');
+
+                if (0 < oldComments.length) {
+                    for (let commentKey = 0; commentKey < oldComments.length; commentKey++) {
+                        oldComments[commentKey].remove();
+                    }
+                }
+
+                if (text == '+') {
+                    element.classList.remove('line_hided');
+                } else {
+                    element.classList.add('line_hided');
+                }
+            });
+
+            return false;
+        } else if (e.target && 'show-comments' === e.target.className) {
+            e.preventDefault();
+
+            if (e.target.textContent == '+') {
+                let commentPromise = getCommentsListPromise(e.target.dataset.taskId);
+
+                commentPromise.then(function (comments) {
+                    addTaskCommentsToTable(comments, e.target.closest('tr'), e.target.dataset.taskId);
+                    e.target.textContent = '-';
+                });
+            } else {
+                let oldComments = document.querySelectorAll('[data-comment-task-id="' + e.target.dataset.taskId + '"]');
+
+                for (let commentKey = 0; commentKey < oldComments.length; commentKey++) {
+                    oldComments[commentKey].remove();
+                }
+                e.target.textContent = '+';
+            }
+
+            return false;
+        }
+
+    });
+
+    let filterDays = document.getElementsByName('F_DATE_DAYS')[0],
+        filterDateFrom = document.getElementsByName("F_DATE_FROM")[0],
+        filterDateTo = document.getElementsByName("F_DATE_TO")[0];
+
+    filterDays.addEventListener('input', function (e) {
+        let days = e.target.value;
+
+        if (0 < days) {
+            let dateFrom = new Date();
+            filterDateTo.valueAsDate = dateFrom;
+
+            dateFrom.setDate(dateFrom.getDate() - days);
+            filterDateFrom.valueAsDate = dateFrom;
+        }
+    });
+
+    let quickPeriod = document.getElementsByName('F_DATE_TYPE')[0];
+
+    quickPeriod.addEventListener('change', function (e) {
+        let rangeType = e.target.value,
+            dateFrom = new Date(),
+            dateTo = new Date();
+
+        switch (rangeType) {
+            case 'month':
+                dateFrom.setDate(1);
+                break;
+            case 'month_ago':
+                dateFrom.setDate(1);
+                dateFrom.setMonth(dateFrom.getMonth() - 1);
+                dateTo.setDate(-1);
+                break;
+            case 'week':
+                dateFrom.setDate(getMonday(dateFrom).getDate());
+                break;
+            case 'week_ago':
+                dateFrom.setDate(dateFrom.getDate() - 7);
+                dateFrom.setDate(getMonday(dateFrom).getDate());
+                dateTo.setDate(dateTo.getDate() - 7);
+                break;
+            default:
+                break;
+        }
+
+
+        filterDateTo.valueAsDate = dateTo;
+        filterDateFrom.valueAsDate = dateFrom;
+    });
+
+    function getMonday(date) {
+
+        let day = date.getDay(),
+            diff = date.getDate() - day + (day == 0 ? -6 : 1);
+
+        return new Date(date.setDate(diff));
+    }
+
+    /**
+     *  Convert string with date to ISO format
+     *
+     * @param dateString
+     * @returns {*}
+     */
+    function dateToISO(dateString) {
+
+        if (!dateString && 0 === dateString.length) {
+            return null;
+        }
+
+        let dateSplit = dateString.split(/\D/),
+            dateObject = new Date();
+
+        dateObject.setFullYear(dateSplit[0]);
+        dateObject.setMonth(dateSplit[1]);
+        dateObject.setMonth(dateObject.getMonth() - 1);
+        dateObject.setDate(dateSplit[2]);
+
+        return dateObject.toISOString();
+    }
+
+    /**
+     * Convert date from ISO format to readable
+     **/
+    function dateToReadable(dateString) {
+
+        let dateObject = new Date(dateString),
+            date = ("0" + dateObject.getDate()).slice(-2) + '.' + ("0" + (dateObject.getMonth() + 1)).slice(-2) + '.' + dateObject.getFullYear();
+
+        date += ' ' + dateObject.getHours() + ':' + ("0" + dateObject.getMinutes()).slice(-2);
+
+        return date;
+    }
+
+    /**
+     * Get auditors names by array with id`s
+     *
+     * @param auditors
+     * @returns {string}
+     */
+    function getAuditorsList(auditors) {
+
+        let auditorsLine = '';
+        for (let auditorKey = 0; auditorKey < auditors.length; auditors++) {
+            if (0 < auditorKey) {
+                auditorsLine += ', ';
+            }
+
+            auditorsLine += getUserById(auditors[auditorKey]);
+        }
+
+        return auditorsLine;
+    }
+
+    /**
+     * Remove from text some bitrix tags like  [USER=168]
+     *
+     * @param text
+     * @returns {*}
+     */
+    function removeTags(text) {
+
+        text = text.replace(/(\[([^>]+)\])/gi, "");
+
+        return text;
+    }
+
+</script>
+</body>
+</html>
