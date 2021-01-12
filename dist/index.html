@@ -490,7 +490,10 @@ function addUserToTable(tableType, user) {
         cellTaskShow.appendChild(taskShow);
       }
 
-      var taskTitle = document.createTextNode(task.title);
+      var taskTitle = document.createElement("a");
+      taskTitle.setAttribute('href', 'https://eva.bitrix24.ru/company/personal/user/' + currentUser.ID + '/tasks/task/view/' + task.id + '/');
+      taskTitle.setAttribute('target', '_blank');
+      taskTitle.appendChild(document.createTextNode(task.title));
       cellTaskTitle.appendChild(taskTitle);
       var taskCreated = document.createTextNode(prettyDate(task.createdDate));
       cellTaskCreated.appendChild(taskCreated);
@@ -712,7 +715,7 @@ function dateToReadable(dateString) {
 function getAuditorsList(auditors) {
   var auditorsLine = '';
 
-  for (var auditorKey = 0; auditorKey < auditors.length; auditors++) {
+  for (var auditorKey = 0; auditorKey < auditors.length; auditorKey++) {
     if (0 < auditorKey) {
       auditorsLine += ', ';
     }

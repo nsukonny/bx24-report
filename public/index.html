@@ -330,6 +330,7 @@
 
         for (let userKey = 0; userKey < allActiveUsers.length; userKey++) {
             if (userId == allActiveUsers[userKey].ID) {
+
                 return allActiveUsers[userKey].NAME + ' ' + allActiveUsers[userKey].LAST_NAME;
             }
         }
@@ -564,7 +565,10 @@
                     cellTaskShow.appendChild(taskShow);
                 }
 
-                let taskTitle = document.createTextNode(task.title);
+                let taskTitle = document.createElement("a");
+                taskTitle.setAttribute('href', 'https://eva.bitrix24.ru/company/personal/user/' + currentUser.ID + '/tasks/task/view/' + task.id + '/');
+                taskTitle.setAttribute('target', '_blank');
+                taskTitle.appendChild(document.createTextNode(task.title));
                 cellTaskTitle.appendChild(taskTitle);
 
                 let taskCreated = document.createTextNode(prettyDate(task.createdDate));
@@ -799,7 +803,8 @@
     function getAuditorsList(auditors) {
 
         let auditorsLine = '';
-        for (let auditorKey = 0; auditorKey < auditors.length; auditors++) {
+
+        for (let auditorKey = 0; auditorKey < auditors.length; auditorKey++) {
             if (0 < auditorKey) {
                 auditorsLine += ', ';
             }
